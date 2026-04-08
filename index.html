@@ -1,0 +1,789 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Schooltrack V3.0 — Project Tracker</title>
+<style>
+  :root {
+    --primary: #1B3A6B;
+    --secondary: #2E86AB;
+    --accent: #F97316;
+    --green: #16A34A;
+    --yellow: #D97706;
+    --red: #DC2626;
+    --light: #EEF4FB;
+    --lightgray: #F1F5F9;
+    --gray: #64748B;
+    --dark: #1E293B;
+    --white: #FFFFFF;
+  }
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body { font-family: 'Segoe UI', Arial, sans-serif; background: #F0F4F8; color: var(--dark); }
+
+  /* Header */
+  .header { background: linear-gradient(135deg, var(--primary) 0%, #2563EB 100%); color: white; padding: 28px 40px; display: flex; justify-content: space-between; align-items: center; box-shadow: 0 4px 20px rgba(0,0,0,0.2); }
+  .header-left h1 { font-size: 26px; font-weight: 700; letter-spacing: 0.5px; }
+  .header-left p { font-size: 13px; opacity: 0.8; margin-top: 4px; }
+  .header-right { display: flex; gap: 12px; }
+  .phase-badge { background: rgba(255,255,255,0.15); border: 1px solid rgba(255,255,255,0.3); border-radius: 20px; padding: 6px 16px; font-size: 12px; font-weight: 600; cursor: pointer; transition: all 0.2s; }
+  .phase-badge:hover, .phase-badge.active { background: var(--accent); border-color: var(--accent); }
+
+  /* Stats bar */
+  .stats-bar { background: white; padding: 20px 40px; display: flex; gap: 20px; border-bottom: 1px solid #E2E8F0; box-shadow: 0 1px 4px rgba(0,0,0,0.06); flex-wrap: wrap; }
+  .stat-card { flex: 1; min-width: 140px; background: var(--lightgray); border-radius: 12px; padding: 14px 18px; border-left: 4px solid var(--primary); }
+  .stat-card .label { font-size: 11px; font-weight: 600; color: var(--gray); text-transform: uppercase; letter-spacing: 0.5px; }
+  .stat-card .value { font-size: 28px; font-weight: 800; color: var(--primary); margin-top: 2px; }
+  .stat-card.green { border-color: var(--green); } .stat-card.green .value { color: var(--green); }
+  .stat-card.yellow { border-color: var(--yellow); } .stat-card.yellow .value { color: var(--yellow); }
+  .stat-card.orange { border-color: var(--accent); } .stat-card.orange .value { color: var(--accent); }
+  .stat-card.red { border-color: var(--red); } .stat-card.red .value { color: var(--red); }
+
+  /* Progress bar */
+  .progress-section { background: white; padding: 20px 40px; border-bottom: 1px solid #E2E8F0; }
+  .progress-section h3 { font-size: 14px; font-weight: 700; color: var(--primary); margin-bottom: 12px; }
+  .progress-row { display: flex; align-items: center; gap: 16px; margin-bottom: 10px; }
+  .progress-label { width: 160px; font-size: 13px; font-weight: 600; color: var(--dark); flex-shrink: 0; }
+  .progress-track { flex: 1; background: #E2E8F0; border-radius: 8px; height: 14px; overflow: hidden; }
+  .progress-fill { height: 100%; border-radius: 8px; transition: width 1s ease; }
+  .p-done { background: var(--green); }
+  .p-inprogress { background: linear-gradient(90deg, var(--green), var(--yellow)); }
+  .p-planned { background: #CBD5E1; }
+  .progress-pct { font-size: 13px; font-weight: 700; color: var(--gray); width: 40px; text-align: right; }
+
+  /* Main content */
+  .main { padding: 24px 40px; }
+  .controls { display: flex; gap: 12px; margin-bottom: 20px; flex-wrap: wrap; align-items: center; }
+  .search-input { flex: 1; min-width: 200px; padding: 10px 16px; border: 2px solid #E2E8F0; border-radius: 10px; font-size: 14px; outline: none; transition: border 0.2s; }
+  .search-input:focus { border-color: var(--secondary); }
+  .filter-btn { padding: 10px 18px; border: 2px solid #E2E8F0; border-radius: 10px; font-size: 13px; font-weight: 600; cursor: pointer; background: white; color: var(--gray); transition: all 0.2s; }
+  .filter-btn:hover, .filter-btn.active { background: var(--primary); color: white; border-color: var(--primary); }
+
+  /* Modules grid */
+  .modules-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(340px, 1fr)); gap: 20px; }
+  .module-card { background: white; border-radius: 16px; overflow: hidden; box-shadow: 0 2px 12px rgba(0,0,0,0.06); border: 1px solid #E2E8F0; transition: box-shadow 0.2s; }
+  .module-card:hover { box-shadow: 0 6px 24px rgba(0,0,0,0.1); }
+  .module-header { padding: 16px 20px; background: linear-gradient(135deg, var(--primary), var(--secondary)); color: white; display: flex; justify-content: space-between; align-items: center; }
+  .module-title { font-size: 15px; font-weight: 700; }
+  .module-phase { background: rgba(255,255,255,0.2); border-radius: 12px; padding: 3px 10px; font-size: 11px; font-weight: 600; }
+  .module-body { padding: 16px 20px; }
+  .module-progress { margin-bottom: 12px; }
+  .module-progress-label { display: flex; justify-content: space-between; font-size: 12px; margin-bottom: 5px; }
+  .module-progress-label span:first-child { font-weight: 600; color: var(--dark); }
+  .module-progress-label span:last-child { color: var(--gray); }
+  .module-track { background: #E2E8F0; border-radius: 6px; height: 10px; overflow: hidden; }
+  .module-fill { height: 100%; border-radius: 6px; transition: width 1s ease; }
+  .features-list { list-style: none; }
+  .feature-item { display: flex; align-items: flex-start; gap: 8px; padding: 7px 0; border-bottom: 1px solid #F1F5F9; font-size: 13px; }
+  .feature-item:last-child { border-bottom: none; }
+  .status-dot { width: 10px; height: 10px; border-radius: 50%; margin-top: 4px; flex-shrink: 0; }
+  .dot-done { background: var(--green); }
+  .dot-inprogress { background: var(--yellow); }
+  .dot-todo { background: #CBD5E1; }
+  .dot-planned { background: var(--secondary); }
+  .feature-name { flex: 1; color: var(--dark); }
+  .feature-tag { font-size: 10px; font-weight: 700; padding: 2px 7px; border-radius: 8px; flex-shrink: 0; }
+  .tag-p0 { background: #FEE2E2; color: var(--red); }
+  .tag-p1 { background: #FEF3C7; color: var(--yellow); }
+  .tag-p2 { background: #DBEAFE; color: #2563EB; }
+
+  /* Status legend */
+  .legend { display: flex; gap: 20px; flex-wrap: wrap; margin-bottom: 20px; background: white; padding: 14px 20px; border-radius: 10px; border: 1px solid #E2E8F0; }
+  .legend-item { display: flex; align-items: center; gap: 7px; font-size: 12px; font-weight: 600; color: var(--gray); }
+
+  /* Timeline */
+  .timeline-section { background: white; border-radius: 16px; padding: 24px; margin-top: 24px; box-shadow: 0 2px 12px rgba(0,0,0,0.06); border: 1px solid #E2E8F0; }
+  .timeline-section h3 { font-size: 18px; font-weight: 700; color: var(--primary); margin-bottom: 20px; }
+  .timeline { position: relative; padding-left: 30px; }
+  .timeline::before { content: ''; position: absolute; left: 10px; top: 0; bottom: 0; width: 2px; background: linear-gradient(to bottom, var(--green), var(--secondary), #CBD5E1); }
+  .tl-item { position: relative; margin-bottom: 24px; }
+  .tl-dot { position: absolute; left: -26px; width: 16px; height: 16px; border-radius: 50%; border: 3px solid white; box-shadow: 0 0 0 2px var(--secondary); }
+  .tl-done { background: var(--green); box-shadow: 0 0 0 2px var(--green); }
+  .tl-current { background: var(--yellow); box-shadow: 0 0 0 2px var(--yellow); animation: pulse 2s infinite; }
+  .tl-future { background: #CBD5E1; box-shadow: 0 0 0 2px #CBD5E1; }
+  @keyframes pulse { 0%,100%{box-shadow:0 0 0 2px var(--yellow)} 50%{box-shadow:0 0 0 5px rgba(217,119,6,0.3)} }
+  .tl-content { background: var(--lightgray); border-radius: 12px; padding: 14px 18px; }
+  .tl-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 6px; }
+  .tl-title { font-size: 15px; font-weight: 700; color: var(--primary); }
+  .tl-date { font-size: 12px; color: var(--gray); background: white; border-radius: 8px; padding: 3px 10px; }
+  .tl-desc { font-size: 13px; color: var(--gray); }
+  .tl-tags { display: flex; gap: 6px; margin-top: 8px; flex-wrap: wrap; }
+  .tl-tag { font-size: 11px; font-weight: 600; padding: 3px 10px; border-radius: 20px; background: rgba(27,58,107,0.1); color: var(--primary); }
+
+  /* Client note */
+  .client-note { background: linear-gradient(135deg, #FFF7ED, #FEF3C7); border: 2px solid var(--accent); border-radius: 14px; padding: 20px 24px; margin-top: 24px; }
+  .client-note h4 { font-size: 15px; font-weight: 700; color: var(--accent); margin-bottom: 10px; }
+  .client-note p { font-size: 14px; color: var(--dark); line-height: 1.6; }
+
+  /* Print */
+  @media print {
+    .controls, .phase-badge { display: none; }
+    body { background: white; }
+    .module-card { break-inside: avoid; }
+  }
+
+  /* Top Nav */
+  .top-nav {
+    background: #0F172A;
+    color: white;
+    padding: 12px 40px;
+    position: sticky;
+    top: 0;
+    z-index: 1000;
+    box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+  }
+  .nav-container {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    max-width: 1400px;
+    margin: 0 auto;
+  }
+  .nav-brand {
+    font-weight: 800;
+    font-size: 14px;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    color: var(--secondary);
+  }
+  .nav-links {
+    display: flex;
+    gap: 24px;
+  }
+  .nav-link {
+    color: #94A3B8;
+    text-decoration: none;
+    font-size: 13px;
+    font-weight: 600;
+    transition: color 0.2s;
+  }
+  .nav-link:hover { color: white; }
+  .nav-link.active { color: white; border-bottom: 2px solid var(--accent); padding-bottom: 4px; }
+  .deploy-badge {
+    font-size: 10px;
+    background: var(--green);
+    color: white;
+    padding: 4px 10px;
+    border-radius: 12px;
+    font-weight: 700;
+    text-transform: uppercase;
+  }
+</style>
+</head>
+<body>
+<nav class="top-nav">
+  <div class="nav-container">
+    <div class="nav-brand">Schooltrack Blueprint</div>
+    <div class="nav-links">
+      <a href="index.html" class="nav-link active">Project Tracker</a>
+      <a href="flow.html" class="nav-link">UI Flow Diagram</a>
+    </div>
+    <div class="deploy-badge">Vercel Ready</div>
+  </div>
+</nav>
+
+<div class="header">
+  <div class="header-left">
+    <h1>🏫 Schooltrack V3.0 — Project Tracker</h1>
+    <p>Integrated School Management System | Infoworks Nigeria | Stack: Laravel + Vue.js</p>
+  </div>
+  <div class="header-right">
+    <div class="phase-badge active" onclick="filterPhase('all', this)">All Phases</div>
+    <div class="phase-badge" onclick="filterPhase('MVP 1', this)">MVP 1</div>
+    <div class="phase-badge" onclick="filterPhase('MVP 2', this)">MVP 2</div>
+    <div class="phase-badge" onclick="filterPhase('MVP 3', this)">MVP 3</div>
+  </div>
+</div>
+
+<div class="stats-bar">
+  <div class="stat-card"><div class="label">Total Modules</div><div class="value" id="total-modules">19</div></div>
+  <div class="stat-card green"><div class="label">Completed</div><div class="value" id="done-count">0</div></div>
+  <div class="stat-card yellow"><div class="label">In Progress</div><div class="value" id="inprogress-count">0</div></div>
+  <div class="stat-card orange"><div class="label">To Do (MVP 1)</div><div class="value" id="todo-count">0</div></div>
+  <div class="stat-card"><div class="label">Planned (MVP 2+)</div><div class="value" id="planned-count">0</div></div>
+  <div class="stat-card"><div class="label">Total Features</div><div class="value" id="features-count">0</div></div>
+</div>
+
+<div class="progress-section">
+  <h3>📊 OVERALL PROJECT PROGRESS BY PHASE</h3>
+  <div class="progress-row">
+    <div class="progress-label">MVP 1 — Core System</div>
+    <div class="progress-track"><div class="progress-fill p-inprogress" id="mvp1-bar" style="width:0%"></div></div>
+    <div class="progress-pct" id="mvp1-pct">0%</div>
+  </div>
+  <div class="progress-row">
+    <div class="progress-label">MVP 2 — Advanced</div>
+    <div class="progress-track"><div class="progress-fill p-planned" style="width:0%" id="mvp2-bar"></div></div>
+    <div class="progress-pct" id="mvp2-pct">0%</div>
+  </div>
+  <div class="progress-row">
+    <div class="progress-label">MVP 3 — AI & Scale</div>
+    <div class="progress-track"><div class="progress-fill p-planned" style="width:0%" id="mvp3-bar"></div></div>
+    <div class="progress-pct" id="mvp3-pct">0%</div>
+  </div>
+</div>
+
+<div class="main">
+  <div class="controls">
+    <input type="text" class="search-input" placeholder="🔍 Search modules or features..." oninput="filterSearch(this.value)">
+    <button class="filter-btn active" onclick="filterStatus('all', this)">All</button>
+    <button class="filter-btn" onclick="filterStatus('Todo', this)">To Do</button>
+    <button class="filter-btn" onclick="filterStatus('In Progress', this)">In Progress</button>
+    <button class="filter-btn" onclick="filterStatus('Done', this)">Done</button>
+    <button class="filter-btn" onclick="filterStatus('Planned', this)">Planned</button>
+  </div>
+
+  <div class="legend">
+    <div class="legend-item"><span class="status-dot dot-done"></span>Done</div>
+    <div class="legend-item"><span class="status-dot dot-inprogress"></span>In Progress</div>
+    <div class="legend-item"><span class="status-dot dot-todo"></span>To Do</div>
+    <div class="legend-item"><span class="status-dot dot-planned"></span>Planned (MVP 2+)</div>
+    <div style="margin-left:auto;display:flex;gap:12px">
+      <span class="feature-tag tag-p0">P0 Critical</span>
+      <span class="feature-tag tag-p1">P1 High</span>
+      <span class="feature-tag tag-p2">P2 Medium</span>
+    </div>
+  </div>
+
+  <div class="modules-grid" id="modules-grid"></div>
+
+  <!-- Timeline -->
+  <div class="timeline-section" id="timeline-section">
+    <h3>📅 DELIVERY TIMELINE</h3>
+    <div class="timeline">
+      <div class="tl-item">
+        <div class="tl-dot tl-current"></div>
+        <div class="tl-content">
+          <div class="tl-header">
+            <div class="tl-title">🚀 Project Kickoff & Setup</div>
+            <div class="tl-date">Apr 2026 — Sprints 1–2</div>
+          </div>
+          <div class="tl-desc">Multi-tenancy foundation, authentication, RBAC, global admin panel, school setup wizard, general settings.</div>
+          <div class="tl-tags">
+            <span class="tl-tag">Laravel 11 Setup</span>
+            <span class="tl-tag">Vue.js 3 Setup</span>
+            <span class="tl-tag">Multi-tenancy</span>
+            <span class="tl-tag">Auth / RBAC</span>
+          </div>
+        </div>
+      </div>
+      <div class="tl-item">
+        <div class="tl-dot tl-future"></div>
+        <div class="tl-content">
+          <div class="tl-header">
+            <div class="tl-title">📋 Student & Staff Core</div>
+            <div class="tl-date">May 2026 — Sprints 3–5</div>
+          </div>
+          <div class="tl-desc">Enrolment, student records, parent management, HR module, staff attendance, timetable builder, school calendar.</div>
+          <div class="tl-tags">
+            <span class="tl-tag">Enrolment</span>
+            <span class="tl-tag">Student Records</span>
+            <span class="tl-tag">HR / Payroll</span>
+            <span class="tl-tag">Timetable</span>
+          </div>
+        </div>
+      </div>
+      <div class="tl-item">
+        <div class="tl-dot tl-future"></div>
+        <div class="tl-content">
+          <div class="tl-header">
+            <div class="tl-title">🎓 Academics & Finance</div>
+            <div class="tl-date">Jun–Jul 2026 — Sprints 6–8</div>
+          </div>
+          <div class="tl-desc">Gradebook, CA & exam entry, broadsheets, report cards, maker-checker workflow, fees billing, payment gateway, receipts.</div>
+          <div class="tl-tags">
+            <span class="tl-tag">Gradebook</span>
+            <span class="tl-tag">Report Cards</span>
+            <span class="tl-tag">Fees & Billing</span>
+            <span class="tl-tag">Paystack</span>
+          </div>
+        </div>
+      </div>
+      <div class="tl-item">
+        <div class="tl-dot tl-future"></div>
+        <div class="tl-content">
+          <div class="tl-header">
+            <div class="tl-title">👨‍👩‍👧 Portals & Notifications</div>
+            <div class="tl-date">Aug 2026 — Sprints 9–10</div>
+          </div>
+          <div class="tl-desc">Parent portal (myschooltrack.com), teacher portal, student portal, notification engine (SMS/Email/WhatsApp), library basic, clinic basic.</div>
+          <div class="tl-tags">
+            <span class="tl-tag">Parent Portal</span>
+            <span class="tl-tag">Teacher Portal</span>
+            <span class="tl-tag">SMS / WhatsApp</span>
+            <span class="tl-tag">Library</span>
+          </div>
+        </div>
+      </div>
+      <div class="tl-item">
+        <div class="tl-dot tl-future"></div>
+        <div class="tl-content">
+          <div class="tl-header">
+            <div class="tl-title">🔐 API, Security & Hostel/Transport</div>
+            <div class="tl-date">Sep 2026 — Sprints 11–12</div>
+          </div>
+          <div class="tl-desc">RESTful API v1, Swagger docs, webhooks, NDPR security hardening, hostel & transport basics, offline PWA mode, data import/export.</div>
+          <div class="tl-tags">
+            <span class="tl-tag">REST API v1</span>
+            <span class="tl-tag">NDPR Compliance</span>
+            <span class="tl-tag">Hostel</span>
+            <span class="tl-tag">Transport</span>
+            <span class="tl-tag">PWA Offline</span>
+          </div>
+        </div>
+      </div>
+      <div class="tl-item">
+        <div class="tl-dot tl-future"></div>
+        <div class="tl-content">
+          <div class="tl-header">
+            <div class="tl-title">✅ MVP 1 UAT & Go Live</div>
+            <div class="tl-date">Oct 2026 — Sprint 13</div>
+          </div>
+          <div class="tl-desc">User acceptance testing, performance tuning, load testing (30M student scale), bug fixes, staging deployment, production go-live.</div>
+          <div class="tl-tags">
+            <span class="tl-tag">UAT</span>
+            <span class="tl-tag">Load Testing</span>
+            <span class="tl-tag">Go Live</span>
+          </div>
+        </div>
+      </div>
+      <div class="tl-item">
+        <div class="tl-dot tl-future"></div>
+        <div class="tl-content">
+          <div class="tl-header">
+            <div class="tl-title">🌟 MVP 2 — Advanced Features</div>
+            <div class="tl-date">Nov 2026 – Mar 2027</div>
+          </div>
+          <div class="tl-desc">Online classrooms, school website manager, full accounting, SchoolShop, mobile apps (Android/iOS), MFA, advanced analytics.</div>
+          <div class="tl-tags">
+            <span class="tl-tag">Online Classes</span>
+            <span class="tl-tag">Mobile Apps</span>
+            <span class="tl-tag">Accounting</span>
+            <span class="tl-tag">SchoolShop</span>
+          </div>
+        </div>
+      </div>
+      <div class="tl-item">
+        <div class="tl-dot tl-future"></div>
+        <div class="tl-content">
+          <div class="tl-header">
+            <div class="tl-title">🤖 MVP 3 — AI & Scale</div>
+            <div class="tl-date">Apr – Jun 2027</div>
+          </div>
+          <div class="tl-desc">AI-driven insights, predictive health, zero-trust security, digital hostel pass, social networking, STEM resource center.</div>
+          <div class="tl-tags">
+            <span class="tl-tag">AI Analytics</span>
+            <span class="tl-tag">Zero-Trust</span>
+            <span class="tl-tag">Social Network</span>
+            <span class="tl-tag">STEM Center</span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="client-note">
+    <h4>📌 Note to Client — Infoworks Nigeria</h4>
+    <p>This tracker is a live view of the Schooltrack V3.0 development progress. Every feature listed is drawn directly from the Requirement Document v2.1. Module statuses are updated at the end of each sprint. The development team can update feature statuses by clicking the status dots. Final delivery of MVP 1 is targeted for <strong>October 2026</strong>, with the system designed to scale to <strong>30 million students and 15 million parents</strong> from day one. All data handling is aligned with the <strong>Nigeria Data Protection Act (NDPA 2023)</strong>.</p>
+  </div>
+</div>
+
+<script>
+const modules = [
+  {
+    id: 'system-admin', name: 'System Administration', phase: 'MVP 1', overallStatus: 'Todo',
+    features: [
+      { name: 'Global Admin Panel (Infoworks Super User)', status: 'Todo', priority: 'P0' },
+      { name: 'School Setup & Tenant Creation', status: 'Todo', priority: 'P0' },
+      { name: 'Multi-campus & Group School Support', status: 'Todo', priority: 'P0' },
+      { name: 'Global System User Access Control', status: 'Todo', priority: 'P0' },
+      { name: 'SMS Allocation & Subscription Management', status: 'Todo', priority: 'P0' },
+      { name: 'Global Parent Register (Unique ID across schools)', status: 'Todo', priority: 'P0' },
+      { name: 'Global Calendar & System Parameters', status: 'Todo', priority: 'P1' },
+      { name: 'Global Reporting Dashboard', status: 'Todo', priority: 'P1' },
+      { name: 'School System Admin Panel (Per-School)', status: 'Todo', priority: 'P0' },
+      { name: 'Social Media Handle Administration', status: 'Todo', priority: 'P2' },
+    ]
+  },
+  {
+    id: 'auth', name: 'Authentication & SSO', phase: 'MVP 1', overallStatus: 'Todo',
+    features: [
+      { name: 'Single Sign-On with School Branding', status: 'Todo', priority: 'P0' },
+      { name: 'Role-Based Redirect After Login', status: 'Todo', priority: 'P0' },
+      { name: 'Password Toggle (Show/Hide)', status: 'Todo', priority: 'P1' },
+      { name: 'Forced Password Change on First Login', status: 'Todo', priority: 'P0' },
+      { name: 'Configurable Password Policy', status: 'Todo', priority: 'P1' },
+      { name: 'Session Timeout & Manual Logout', status: 'Todo', priority: 'P1' },
+      { name: 'MFA (SMS OTP / Authenticator)', status: 'Planned', priority: 'P1' },
+    ]
+  },
+  {
+    id: 'general-settings', name: 'General Settings', phase: 'MVP 1', overallStatus: 'Todo',
+    features: [
+      { name: 'User & Role Management', status: 'Todo', priority: 'P0' },
+      { name: 'Location & Campus Manager', status: 'Todo', priority: 'P0' },
+      { name: 'Personnel Settings (Departments, Job Titles)', status: 'Todo', priority: 'P0' },
+      { name: 'Finance & Payroll Settings', status: 'Todo', priority: 'P0' },
+      { name: 'Result & Grading Settings', status: 'Todo', priority: 'P0' },
+      { name: 'Student & Facility Settings', status: 'Todo', priority: 'P1' },
+    ]
+  },
+  {
+    id: 'enrolment', name: 'Enrolment & Admission', phase: 'MVP 1', overallStatus: 'Todo',
+    features: [
+      { name: 'Online Application Form (Embeddable)', status: 'Todo', priority: 'P0' },
+      { name: 'Application Fee Payment via Gateway', status: 'Todo', priority: 'P0' },
+      { name: 'Application Approval / Decline Workflow', status: 'Todo', priority: 'P0' },
+      { name: 'Auto-Convert Applicant to Student Record', status: 'Todo', priority: 'P0' },
+      { name: 'Enrolment List with Auto-Generated Numbers', status: 'Todo', priority: 'P0' },
+      { name: 'Standard Letters (Bulk Mail Merge)', status: 'Todo', priority: 'P1' },
+      { name: 'Prospect / Enquiry Tracking', status: 'Todo', priority: 'P1' },
+    ]
+  },
+  {
+    id: 'student-records', name: 'Student Records', phase: 'MVP 1', overallStatus: 'Todo',
+    features: [
+      { name: 'Full Student Bio-Data & Profile', status: 'Todo', priority: 'P0' },
+      { name: 'Parent / Guardian Linking', status: 'Todo', priority: 'P0' },
+      { name: 'Medical Records (Blood group, Allergies, etc.)', status: 'Todo', priority: 'P0' },
+      { name: 'Immunization Records', status: 'Todo', priority: 'P1' },
+      { name: 'Discipline Records (Time-bound)', status: 'Todo', priority: 'P1' },
+      { name: 'Academic Records History', status: 'Todo', priority: 'P0' },
+      { name: 'Past Students / Alumni Management', status: 'Todo', priority: 'P1' },
+      { name: 'Transport Route & Ticketing Assignment', status: 'Todo', priority: 'P1' },
+    ]
+  },
+  {
+    id: 'staff-hr', name: 'Staff & Human Resources', phase: 'MVP 1', overallStatus: 'Todo',
+    features: [
+      { name: 'Employee Records (Full Bio-Data)', status: 'Todo', priority: 'P0' },
+      { name: 'Auto-Generated Employee Number', status: 'Todo', priority: 'P0' },
+      { name: 'Staff Attendance Marking & Reports', status: 'Todo', priority: 'P0' },
+      { name: 'Employee Loan Management', status: 'Todo', priority: 'P1' },
+      { name: 'Payroll Computation (Attendance-Based)', status: 'Todo', priority: 'P0' },
+      { name: 'Payslip Generation & Email Delivery', status: 'Todo', priority: 'P0' },
+      { name: 'Payroll Reports (Current & Historical)', status: 'Todo', priority: 'P1' },
+    ]
+  },
+  {
+    id: 'timetable', name: 'Timetable & Calendar', phase: 'MVP 1', overallStatus: 'Todo',
+    features: [
+      { name: 'Class Timetable Builder (Clash Detection)', status: 'Todo', priority: 'P0' },
+      { name: 'Teacher & Room Availability View', status: 'Todo', priority: 'P1' },
+      { name: 'Print Timetables (Students, Teachers, Rooms)', status: 'Todo', priority: 'P1' },
+      { name: 'School Calendar (Day/Week/Month View)', status: 'Todo', priority: 'P0' },
+      { name: 'Announcements (Role-Based Visibility)', status: 'Todo', priority: 'P1' },
+    ]
+  },
+  {
+    id: 'academics', name: 'Academics & Gradebook', phase: 'MVP 1', overallStatus: 'Todo',
+    features: [
+      { name: 'Parameterized Grading System Setup', status: 'Todo', priority: 'P0' },
+      { name: 'CA Score Entry by Subject Teacher', status: 'Todo', priority: 'P0' },
+      { name: 'Exam Score Entry', status: 'Todo', priority: 'P0' },
+      { name: 'Automatic Grade Computation', status: 'Todo', priority: 'P0' },
+      { name: 'Class Broadsheet (View & Submit)', status: 'Todo', priority: 'P0' },
+      { name: 'Maker-Checker Result Approval Workflow', status: 'Todo', priority: 'P0' },
+      { name: 'Mid-Term & End-of-Term Report Cards', status: 'Todo', priority: 'P0' },
+      { name: 'Bulk & Individual Report Card Printing', status: 'Todo', priority: 'P0' },
+      { name: 'Psychomotor / Affective Grading', status: 'Todo', priority: 'P1' },
+      { name: 'Class Promotion (General & Individual)', status: 'Todo', priority: 'P1' },
+      { name: 'Assignments (Give, Receive, Mark)', status: 'Todo', priority: 'P1' },
+    ]
+  },
+  {
+    id: 'attendance', name: 'Attendance Management', phase: 'MVP 1', overallStatus: 'Todo',
+    features: [
+      { name: 'Student Attendance Marking (Daily)', status: 'Todo', priority: 'P0' },
+      { name: 'Subject-Level Attendance', status: 'Todo', priority: 'P1' },
+      { name: 'Auto SMS Alert to Parents (Absent)', status: 'Todo', priority: 'P0' },
+      { name: 'Attendance Reports (By Date/Month/Term)', status: 'Todo', priority: 'P0' },
+      { name: 'Staff Attendance (HR Integration)', status: 'Todo', priority: 'P0' },
+    ]
+  },
+  {
+    id: 'fees', name: 'Fees & Billing', phase: 'MVP 1', overallStatus: 'Todo',
+    features: [
+      { name: 'Fee Schedule Configuration (Per Term/Class)', status: 'Todo', priority: 'P0' },
+      { name: 'Invoice Generation & Approval Workflow', status: 'Todo', priority: 'P0' },
+      { name: 'Online Payment via Paystack / Flutterwave', status: 'Todo', priority: 'P0' },
+      { name: 'Receipt & Gate Pass Generation', status: 'Todo', priority: 'P0' },
+      { name: 'Scholarship & Sibling Discounts', status: 'Todo', priority: 'P1' },
+      { name: 'Fee Outstanding Alerts & Interest', status: 'Todo', priority: 'P1' },
+      { name: 'Payment History & Statement', status: 'Todo', priority: 'P0' },
+    ]
+  },
+  {
+    id: 'parent-portal', name: 'Parent Portal', phase: 'MVP 1', overallStatus: 'Todo',
+    features: [
+      { name: 'Multi-Child Dashboard (Cross-School)', status: 'Todo', priority: 'P0' },
+      { name: 'Attendance View & SMS Alerts', status: 'Todo', priority: 'P0' },
+      { name: 'Report Card & Score Sheet Access', status: 'Todo', priority: 'P0' },
+      { name: 'Invoice View & Online Payment', status: 'Todo', priority: 'P0' },
+      { name: 'Assignment View', status: 'Todo', priority: 'P1' },
+      { name: 'Class Timetable View', status: 'Todo', priority: 'P1' },
+      { name: 'Contextual Messaging (to Teachers/Bursar/Head)', status: 'Todo', priority: 'P1' },
+      { name: 'Medical Records View (Read-Only)', status: 'Todo', priority: 'P1' },
+      { name: 'Discipline Records View', status: 'Todo', priority: 'P1' },
+    ]
+  },
+  {
+    id: 'teacher-portal', name: 'Teacher Portal', phase: 'MVP 1', overallStatus: 'Todo',
+    features: [
+      { name: 'Teacher Dashboard (Calendar, Schedule, Alerts)', status: 'Todo', priority: 'P0' },
+      { name: 'Class Attendance Marking', status: 'Todo', priority: 'P0' },
+      { name: 'Gradebook Entry (CA + Exam)', status: 'Todo', priority: 'P0' },
+      { name: 'Broadsheet View & Submission', status: 'Todo', priority: 'P0' },
+      { name: 'Assignment Creation & Marking', status: 'Todo', priority: 'P1' },
+      { name: 'Lecture Notes Upload', status: 'Todo', priority: 'P1' },
+      { name: 'File Manager', status: 'Todo', priority: 'P2' },
+    ]
+  },
+  {
+    id: 'student-portal', name: 'Student Portal', phase: 'MVP 1', overallStatus: 'Todo',
+    features: [
+      { name: 'Student Dashboard (Schedule, Alerts)', status: 'Todo', priority: 'P1' },
+      { name: 'Attendance View (Own)', status: 'Todo', priority: 'P1' },
+      { name: 'Score Sheet & Report Card View', status: 'Todo', priority: 'P1' },
+      { name: 'Assignment View & Submission', status: 'Todo', priority: 'P1' },
+      { name: 'Timetable View', status: 'Todo', priority: 'P2' },
+      { name: 'File Manager (Upload Assignments)', status: 'Todo', priority: 'P2' },
+    ]
+  },
+  {
+    id: 'library', name: 'Library System', phase: 'MVP 1', overallStatus: 'Todo',
+    features: [
+      { name: 'Book Catalogue & Master Data', status: 'Todo', priority: 'P1' },
+      { name: 'Book Lending & Return Management', status: 'Todo', priority: 'P1' },
+      { name: 'Real-Time Book Availability', status: 'Todo', priority: 'P1' },
+      { name: 'Borrowing Limit Enforcement', status: 'Todo', priority: 'P1' },
+      { name: 'Library Reports (Inventory, Overdue)', status: 'Todo', priority: 'P1' },
+      { name: 'Book Reservation & Renewal', status: 'Planned', priority: 'P1' },
+      { name: 'E-Resources & Digital Materials', status: 'Planned', priority: 'P2' },
+      { name: 'Barcode / QR Code Support', status: 'Planned', priority: 'P2' },
+    ]
+  },
+  {
+    id: 'clinic', name: 'School Clinic', phase: 'MVP 1', overallStatus: 'Todo',
+    features: [
+      { name: 'Clinic Visit Log & Treatment Record', status: 'Todo', priority: 'P1' },
+      { name: 'Student & Staff Medical Records', status: 'Todo', priority: 'P1' },
+      { name: 'Medicine / First Aid Register', status: 'Todo', priority: 'P1' },
+      { name: 'Auto Parent Notification (Visit/Sent Home)', status: 'Todo', priority: 'P1' },
+      { name: 'Clinic Reports (Daily, Individual History)', status: 'Todo', priority: 'P1' },
+      { name: 'Extended Medical History & Immunization', status: 'Planned', priority: 'P1' },
+      { name: 'Incident & Accident Management', status: 'Planned', priority: 'P1' },
+      { name: 'Health Analytics & Trend Reports', status: 'Planned', priority: 'P2' },
+    ]
+  },
+  {
+    id: 'hostel', name: 'Hostel Management', phase: 'MVP 1', overallStatus: 'Todo',
+    features: [
+      { name: 'Hostel Setup & Room/Bed Management', status: 'Todo', priority: 'P1' },
+      { name: 'Student Hostel Allocation', status: 'Todo', priority: 'P1' },
+      { name: 'Hostel Attendance (Morning & Evening)', status: 'Todo', priority: 'P1' },
+      { name: 'Hostel Fee Management', status: 'Todo', priority: 'P1' },
+      { name: 'Hostel Reports', status: 'Todo', priority: 'P1' },
+      { name: 'Movement & Exeat Permission', status: 'Planned', priority: 'P1' },
+      { name: 'Digital Hostel Pass (QR)', status: 'Planned', priority: 'P2' },
+    ]
+  },
+  {
+    id: 'transport', name: 'School Transport', phase: 'MVP 1', overallStatus: 'Todo',
+    features: [
+      { name: 'Route & Stop Management', status: 'Todo', priority: 'P1' },
+      { name: 'Vehicle Register & Document Tracking', status: 'Todo', priority: 'P1' },
+      { name: 'Driver Management & License Alerts', status: 'Todo', priority: 'P1' },
+      { name: 'Student Transport Assignment', status: 'Todo', priority: 'P1' },
+      { name: 'Transport Attendance (Pickup/Dropoff)', status: 'Todo', priority: 'P1' },
+      { name: 'Parent Notifications (Pickup/Dropoff/Delay)', status: 'Todo', priority: 'P1' },
+      { name: 'Transport Fee & Billing', status: 'Todo', priority: 'P1' },
+      { name: 'GPS Fleet Integration', status: 'Planned', priority: 'P2' },
+    ]
+  },
+  {
+    id: 'notifications', name: 'SMS / WhatsApp / Email Engine', phase: 'MVP 1', overallStatus: 'Todo',
+    features: [
+      { name: 'Embedded SMS Platform (Termii)', status: 'Todo', priority: 'P0' },
+      { name: 'WhatsApp Business API Integration', status: 'Todo', priority: 'P0' },
+      { name: 'Email via Mailgun / SendGrid', status: 'Todo', priority: 'P0' },
+      { name: 'SMS Usage Dashboard', status: 'Todo', priority: 'P1' },
+      { name: 'Delivery Status Tracking', status: 'Todo', priority: 'P1' },
+      { name: 'Bulk Broadcast to Parent Groups', status: 'Todo', priority: 'P1' },
+    ]
+  },
+  {
+    id: 'api-security', name: 'API & Security', phase: 'MVP 1', overallStatus: 'Todo',
+    features: [
+      { name: 'RESTful API v1 (All Core Endpoints)', status: 'Todo', priority: 'P0' },
+      { name: 'Swagger / OpenAPI Documentation', status: 'Todo', priority: 'P0' },
+      { name: 'Webhooks (Payment, Enrolment, Results)', status: 'Todo', priority: 'P0' },
+      { name: 'RBAC & Audit Trail', status: 'Todo', priority: 'P0' },
+      { name: 'Data Encryption (TLS + AES-256)', status: 'Todo', priority: 'P0' },
+      { name: 'NDPR / NDPA Compliance Controls', status: 'Todo', priority: 'P0' },
+      { name: 'Maker-Checker System-Wide', status: 'Todo', priority: 'P0' },
+      { name: 'Automated Daily Backups', status: 'Todo', priority: 'P0' },
+      { name: 'MFA & Advanced Session Control', status: 'Planned', priority: 'P1' },
+      { name: 'Zero-Trust & DDoS Protection', status: 'Planned', priority: 'P2' },
+    ]
+  },
+];
+
+const statusMap = {
+  'Done': { dot: 'dot-done', fill: '#16A34A' },
+  'In Progress': { dot: 'dot-inprogress', fill: '#D97706' },
+  'Todo': { dot: 'dot-todo', fill: '#CBD5E1' },
+  'Planned': { dot: 'dot-planned', fill: '#2E86AB' },
+};
+
+let currentPhaseFilter = 'all';
+let currentStatusFilter = 'all';
+let currentSearch = '';
+
+function getModuleProgress(mod) {
+  const done = mod.features.filter(f => f.status === 'Done').length;
+  const inprog = mod.features.filter(f => f.status === 'In Progress').length;
+  const total = mod.features.length;
+  const pct = Math.round(((done + inprog * 0.5) / total) * 100);
+  return { done, inprog, total, pct };
+}
+
+function getModuleColor(pct) {
+  if (pct === 0) return '#CBD5E1';
+  if (pct === 100) return '#16A34A';
+  if (pct >= 50) return '#2E86AB';
+  return '#D97706';
+}
+
+function renderModules() {
+  const grid = document.getElementById('modules-grid');
+  const filtered = modules.filter(m => {
+    const phaseMatch = currentPhaseFilter === 'all' || m.phase === currentPhaseFilter;
+    const searchMatch = currentSearch === '' || m.name.toLowerCase().includes(currentSearch.toLowerCase()) || m.features.some(f => f.name.toLowerCase().includes(currentSearch.toLowerCase()));
+    const statusMatch = currentStatusFilter === 'all' || m.features.some(f => f.status === currentStatusFilter) || m.overallStatus === currentStatusFilter;
+    return phaseMatch && searchMatch && statusMatch;
+  });
+
+  grid.innerHTML = filtered.map(mod => {
+    const prog = getModuleProgress(mod);
+    const color = getModuleColor(prog.pct);
+    return `
+      <div class="module-card" data-phase="${mod.phase}" data-id="${mod.id}">
+        <div class="module-header">
+          <div class="module-title">${mod.name}</div>
+          <div class="module-phase">${mod.phase}</div>
+        </div>
+        <div class="module-body">
+          <div class="module-progress">
+            <div class="module-progress-label">
+              <span>Progress</span>
+              <span>${prog.done}/${prog.total} features • ${prog.pct}%</span>
+            </div>
+            <div class="module-track">
+              <div class="module-fill" style="width:${prog.pct}%;background:${color}"></div>
+            </div>
+          </div>
+          <ul class="features-list">
+            ${mod.features.map(f => `
+              <li class="feature-item" onclick="toggleStatus('${mod.id}','${f.name}', this)">
+                <span class="status-dot ${statusMap[f.status].dot}" title="${f.status}"></span>
+                <span class="feature-name">${f.name}</span>
+                <span class="feature-tag tag-${f.priority.toLowerCase()}">${f.priority}</span>
+              </li>
+            `).join('')}
+          </ul>
+        </div>
+      </div>
+    `;
+  }).join('');
+
+  updateStats();
+}
+
+function toggleStatus(moduleId, featureName, el) {
+  const mod = modules.find(m => m.id === moduleId);
+  const feat = mod.features.find(f => f.name === featureName);
+  const cycle = ['Todo', 'In Progress', 'Done', 'Planned'];
+  const idx = cycle.indexOf(feat.status);
+  feat.status = cycle[(idx + 1) % cycle.length];
+  const dot = el.querySelector('.status-dot');
+  Object.values(statusMap).forEach(v => dot.classList.remove(v.dot));
+  dot.classList.add(statusMap[feat.status].dot);
+  dot.title = feat.status;
+  updateStats();
+  updateCardProgress(moduleId);
+}
+
+function updateCardProgress(moduleId) {
+  const mod = modules.find(m => m.id === moduleId);
+  const prog = getModuleProgress(mod);
+  const card = document.querySelector(`[data-id="${moduleId}"]`);
+  if (!card) return;
+  const fill = card.querySelector('.module-fill');
+  const label = card.querySelector('.module-progress-label span:last-child');
+  fill.style.width = prog.pct + '%';
+  fill.style.background = getModuleColor(prog.pct);
+  label.textContent = `${prog.done}/${prog.total} features • ${prog.pct}%`;
+}
+
+function updateStats() {
+  let done = 0, inprog = 0, todo = 0, planned = 0, total = 0;
+  modules.forEach(m => {
+    m.features.forEach(f => {
+      total++;
+      if (f.status === 'Done') done++;
+      else if (f.status === 'In Progress') inprog++;
+      else if (f.status === 'Todo') todo++;
+      else if (f.status === 'Planned') planned++;
+    });
+  });
+  document.getElementById('done-count').textContent = done;
+  document.getElementById('inprogress-count').textContent = inprog;
+  document.getElementById('todo-count').textContent = todo;
+  document.getElementById('planned-count').textContent = planned;
+  document.getElementById('features-count').textContent = total;
+  document.getElementById('total-modules').textContent = modules.length;
+
+  // Phase progress
+  function phasePct(phase) {
+    const feats = modules.filter(m => m.phase === phase).flatMap(m => m.features);
+    if (!feats.length) return 0;
+    const d = feats.filter(f => f.status === 'Done').length;
+    const ip = feats.filter(f => f.status === 'In Progress').length;
+    return Math.round(((d + ip * 0.5) / feats.length) * 100);
+  }
+  const p1 = phasePct('MVP 1');
+  document.getElementById('mvp1-bar').style.width = p1 + '%';
+  document.getElementById('mvp1-pct').textContent = p1 + '%';
+  const p2 = phasePct('MVP 2');
+  document.getElementById('mvp2-bar').style.width = p2 + '%';
+  document.getElementById('mvp2-pct').textContent = p2 + '%';
+  const p3 = phasePct('MVP 3');
+  document.getElementById('mvp3-bar').style.width = p3 + '%';
+  document.getElementById('mvp3-pct').textContent = p3 + '%';
+}
+
+function filterPhase(phase, el) {
+  currentPhaseFilter = phase;
+  document.querySelectorAll('.phase-badge').forEach(b => b.classList.remove('active'));
+  el.classList.add('active');
+  renderModules();
+}
+
+function filterStatus(status, el) {
+  currentStatusFilter = status;
+  document.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active'));
+  el.classList.add('active');
+  renderModules();
+}
+
+function filterSearch(val) {
+  currentSearch = val;
+  renderModules();
+}
+
+// Init
+renderModules();
+</script>
+</body>
+</html>

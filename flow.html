@@ -1,0 +1,741 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Schooltrack V3.0 — UI Flow Diagram</title>
+<style>
+:root{--primary:#1B3A6B;--secondary:#2E86AB;--accent:#F97316;--green:#16A34A;--light:#EEF4FB;--dark:#1E293B;--gray:#64748B;--white:#fff}
+*{margin:0;padding:0;box-sizing:border-box;font-family:'Segoe UI',Arial,sans-serif}
+body{background:#F0F4F8;color:var(--dark)}
+.header{background:linear-gradient(135deg,var(--primary),#2563EB);color:white;padding:22px 36px;display:flex;justify-content:space-between;align-items:center;box-shadow:0 4px 20px rgba(0,0,0,.2)}
+.header h1{font-size:22px;font-weight:700}
+.header p{font-size:12px;opacity:.8;margin-top:4px}
+.tabs{display:flex;gap:0;background:white;border-bottom:2px solid #E2E8F0;padding:0 36px;overflow-x:auto}
+.tab{padding:14px 22px;font-size:13px;font-weight:600;color:var(--gray);cursor:pointer;border-bottom:3px solid transparent;white-space:nowrap;transition:all .2s}
+.tab:hover{color:var(--primary)}
+.tab.active{color:var(--primary);border-bottom-color:var(--accent)}
+.content{padding:24px 36px;display:none}
+.content.active{display:block}
+
+/* Diagram */
+.diagram{overflow-x:auto;min-height:400px}
+svg text{font-family:'Segoe UI',Arial,sans-serif}
+
+/* Card grid for wireframes */
+.wireframe-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(300px,1fr));gap:20px}
+.wireframe-card{background:white;border-radius:14px;overflow:hidden;box-shadow:0 2px 12px rgba(0,0,0,.07);border:1px solid #E2E8F0}
+.wf-header{background:var(--primary);color:white;padding:12px 18px;font-size:14px;font-weight:700;display:flex;justify-content:space-between;align-items:center}
+.wf-header span{font-size:11px;opacity:.8}
+.wf-body{padding:16px}
+.wf-topbar{background:#E2E8F0;border-radius:6px;padding:8px 12px;margin-bottom:10px;display:flex;align-items:center;gap:8px}
+.wf-avatar{width:28px;height:28px;border-radius:50%;background:var(--secondary)}
+.wf-username{font-size:12px;font-weight:600;color:var(--dark)}
+.wf-role{font-size:10px;color:var(--gray)}
+.wf-stats{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:10px}
+.wf-stat{background:var(--light);border-radius:8px;padding:8px;text-align:center;border-left:3px solid var(--secondary)}
+.wf-stat .v{font-size:18px;font-weight:800;color:var(--primary)}
+.wf-stat .l{font-size:10px;color:var(--gray)}
+.wf-chart{background:#F1F5F9;border-radius:8px;height:60px;margin-bottom:10px;display:flex;align-items:flex-end;padding:8px;gap:4px}
+.bar{flex:1;border-radius:3px 3px 0 0}
+.wf-table{width:100%;border-collapse:collapse;font-size:11px}
+.wf-table th{background:var(--primary);color:white;padding:5px 8px;text-align:left}
+.wf-table td{padding:5px 8px;border-bottom:1px solid #F1F5F9}
+.wf-table tr:nth-child(even) td{background:#F8FAFC}
+.wf-btn{display:inline-block;padding:6px 14px;border-radius:8px;font-size:11px;font-weight:600;cursor:pointer;margin:3px}
+.btn-primary{background:var(--primary);color:white}
+.btn-accent{background:var(--accent);color:white}
+.btn-outline{background:white;color:var(--primary);border:1.5px solid var(--primary)}
+.wf-form-row{display:flex;flex-direction:column;gap:3px;margin-bottom:8px}
+.wf-form-row label{font-size:10px;font-weight:600;color:var(--gray)}
+.wf-input{background:#F1F5F9;border:1.5px solid #E2E8F0;border-radius:6px;padding:6px 10px;font-size:12px;color:var(--dark)}
+.wf-badge{display:inline-block;padding:2px 8px;border-radius:12px;font-size:10px;font-weight:700}
+.badge-green{background:#DCFCE7;color:var(--green)}
+.badge-red{background:#FEE2E2;color:#DC2626}
+.badge-yellow{background:#FEF3C7;color:#D97706}
+.badge-blue{background:#DBEAFE;color:#2563EB}
+.wf-nav{display:flex;gap:6px;margin-bottom:10px;flex-wrap:wrap}
+.wf-nav-item{background:var(--light);border-radius:6px;padding:5px 10px;font-size:10px;font-weight:600;color:var(--primary);cursor:pointer}
+.wf-nav-item.active{background:var(--primary);color:white}
+.wf-sidebar{display:grid;grid-template-columns:80px 1fr;gap:10px}
+.wf-sidebar-menu{display:flex;flex-direction:column;gap:4px}
+.wf-menu-item{background:#F1F5F9;border-radius:6px;padding:6px 8px;font-size:10px;font-weight:600;color:var(--gray);cursor:pointer}
+.wf-menu-item.active{background:var(--primary);color:white}
+
+  /* Top Nav */
+  .top-nav {
+    background: #0F172A;
+    color: white;
+    padding: 12px 40px;
+    position: sticky;
+    top: 0;
+    z-index: 1000;
+    box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+  }
+  .nav-container {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    max-width: 1400px;
+    margin: 0 auto;
+  }
+  .nav-brand {
+    font-weight: 800;
+    font-size: 14px;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    color: var(--secondary);
+  }
+  .nav-links {
+    display: flex;
+    gap: 24px;
+  }
+  .nav-link {
+    color: #94A3B8;
+    text-decoration: none;
+    font-size: 13px;
+    font-weight: 600;
+    transition: color 0.2s;
+  }
+  .nav-link:hover { color: white; }
+  .nav-link.active { color: white; border-bottom: 2px solid var(--accent); padding-bottom: 4px; }
+  .deploy-badge {
+    font-size: 10px;
+    background: var(--green);
+    color: white;
+    padding: 4px 10px;
+    border-radius: 12px;
+    font-weight: 700;
+    text-transform: uppercase;
+  }
+</style>
+</head>
+<body>
+<nav class="top-nav">
+  <div class="nav-container">
+    <div class="nav-brand">Schooltrack Blueprint</div>
+    <div class="nav-links">
+      <a href="index.html" class="nav-link">Project Tracker</a>
+      <a href="flow.html" class="nav-link active">UI Flow Diagram</a>
+    </div>
+    <div class="deploy-badge">GitHub Pages Ready</div>
+  </div>
+</nav>
+<div class="header">
+  <div>
+    <h1>🗺 Schooltrack V3.0 — UI Flow Diagram & Screen Wireframes</h1>
+    <p>Architecture of screens, user journeys, and portal layouts | Laravel + Vue.js</p>
+  </div>
+</div>
+
+<div class="tabs">
+  <div class="tab active" onclick="showTab('flow')">System Flow</div>
+  <div class="tab" onclick="showTab('admin')">Admin Dashboard</div>
+  <div class="tab" onclick="showTab('teacher')">Teacher Portal</div>
+  <div class="tab" onclick="showTab('parent')">Parent Portal</div>
+  <div class="tab" onclick="showTab('student')">Student Portal</div>
+  <div class="tab" onclick="showTab('enrolment')">Enrolment Flow</div>
+  <div class="tab" onclick="showTab('academics')">Academics Flow</div>
+  <div class="tab" onclick="showTab('finance')">Finance Flow</div>
+</div>
+
+<!-- SYSTEM FLOW -->
+<div class="content active" id="flow">
+<div class="diagram">
+<svg width="1100" height="820" viewBox="0 0 1100 820">
+  <defs>
+    <marker id="arrow" markerWidth="8" markerHeight="8" refX="6" refY="3" orient="auto">
+      <path d="M0,0 L0,6 L8,3 z" fill="#64748B"/>
+    </marker>
+    <marker id="arrowB" markerWidth="8" markerHeight="8" refX="6" refY="3" orient="auto">
+      <path d="M0,0 L0,6 L8,3 z" fill="#2E86AB"/>
+    </marker>
+  </defs>
+
+  <!-- Title -->
+  <text x="550" y="30" text-anchor="middle" font-size="16" font-weight="700" fill="#1B3A6B">SCHOOLTRACK V3.0 — SYSTEM FLOW DIAGRAM</text>
+
+  <!-- Internet / Entry -->
+  <ellipse cx="550" cy="90" rx="130" ry="30" fill="#1B3A6B" rx="12"/>
+  <text x="550" y="87" text-anchor="middle" font-size="13" font-weight="700" fill="white">INTERNET / WEB BROWSER</text>
+  <text x="550" y="103" text-anchor="middle" font-size="10" fill="#CBD5E1">school.schooltrack.ng | myschooltrack.com</text>
+
+  <!-- Arrow down -->
+  <line x1="550" y1="120" x2="550" y2="150" stroke="#64748B" stroke-width="2" marker-end="url(#arrow)"/>
+
+  <!-- Login / SSO -->
+  <rect x="400" y="150" width="300" height="55" rx="10" fill="#2E86AB"/>
+  <text x="550" y="172" text-anchor="middle" font-size="13" font-weight="700" fill="white">SINGLE SIGN-ON (SSO)</text>
+  <text x="550" y="190" text-anchor="middle" font-size="10" fill="#CBD5E1">school.schooltrack.ng/login • School Logo + Brand Colors</text>
+
+  <!-- RBAC branch -->
+  <line x1="550" y1="205" x2="550" y2="230" stroke="#64748B" stroke-width="2" marker-end="url(#arrow)"/>
+  <rect x="400" y="230" width="300" height="40" rx="8" fill="#F97316"/>
+  <text x="550" y="255" text-anchor="middle" font-size="12" font-weight="700" fill="white">RBAC CHECK — Role-Based Redirect</text>
+
+  <!-- 5 portals -->
+  <line x1="400" y1="270" x2="100" y2="340" stroke="#1B3A6B" stroke-width="1.5" stroke-dasharray="4"/>
+  <line x1="450" y1="270" x2="250" y2="340" stroke="#1B3A6B" stroke-width="1.5" stroke-dasharray="4"/>
+  <line x1="550" y1="270" x2="550" y2="340" stroke="#1B3A6B" stroke-width="1.5" stroke-dasharray="4"/>
+  <line x1="650" y1="270" x2="800" y2="340" stroke="#1B3A6B" stroke-width="1.5" stroke-dasharray="4"/>
+  <line x1="700" y1="270" x2="1000" y2="340" stroke="#1B3A6B" stroke-width="1.5" stroke-dasharray="4"/>
+
+  <!-- Portal boxes -->
+  <rect x="20" y="340" width="165" height="50" rx="8" fill="#1B3A6B"/>
+  <text x="103" y="361" text-anchor="middle" font-size="11" font-weight="700" fill="white">GLOBAL ADMIN</text>
+  <text x="103" y="377" text-anchor="middle" font-size="9" fill="#CBD5E1">Infoworks Super User</text>
+
+  <rect x="195" y="340" width="165" height="50" rx="8" fill="#2563EB"/>
+  <text x="278" y="361" text-anchor="middle" font-size="11" font-weight="700" fill="white">SCHOOL ADMIN</text>
+  <text x="278" y="377" text-anchor="middle" font-size="9" fill="#CBD5E1">Manager / Director</text>
+
+  <rect x="420" y="340" width="165" height="50" rx="8" fill="#16A34A"/>
+  <text x="503" y="361" text-anchor="middle" font-size="11" font-weight="700" fill="white">TEACHER PORTAL</text>
+  <text x="503" y="377" text-anchor="middle" font-size="9" fill="#D1FAE5">Academic Staff</text>
+
+  <rect x="640" y="340" width="165" height="50" rx="8" fill="#D97706"/>
+  <text x="723" y="361" text-anchor="middle" font-size="11" font-weight="700" fill="white">PARENT PORTAL</text>
+  <text x="723" y="377" text-anchor="middle" font-size="9" fill="#FEF3C7">myschooltrack.com</text>
+
+  <rect x="860" y="340" width="165" height="50" rx="8" fill="#7C3AED"/>
+  <text x="943" y="361" text-anchor="middle" font-size="11" font-weight="700" fill="white">STUDENT PORTAL</text>
+  <text x="943" y="377" text-anchor="middle" font-size="9" fill="#EDE9FE">Academic Portal</text>
+
+  <!-- Module layer -->
+  <rect x="20" y="440" width="1065" height="30" rx="6" fill="#EEF4FB" stroke="#2E86AB" stroke-width="1.5"/>
+  <text x="553" y="460" text-anchor="middle" font-size="12" font-weight="700" fill="#1B3A6B">BACKEND SERVICES LAYER (Laravel APIs — /api/v1/...)</text>
+
+  <!-- Services grid -->
+  <rect x="20" y="490" width="130" height="50" rx="7" fill="white" stroke="#E2E8F0"/>
+  <text x="85" y="511" text-anchor="middle" font-size="10" font-weight="700" fill="#1B3A6B">Enrolment</text>
+  <text x="85" y="527" text-anchor="middle" font-size="9" fill="#64748B">Students/Parents</text>
+
+  <rect x="165" y="490" width="130" height="50" rx="7" fill="white" stroke="#E2E8F0"/>
+  <text x="230" y="511" text-anchor="middle" font-size="10" font-weight="700" fill="#1B3A6B">Academics</text>
+  <text x="230" y="527" text-anchor="middle" font-size="9" fill="#64748B">Grades/Results</text>
+
+  <rect x="310" y="490" width="130" height="50" rx="7" fill="white" stroke="#E2E8F0"/>
+  <text x="375" y="511" text-anchor="middle" font-size="10" font-weight="700" fill="#1B3A6B">Attendance</text>
+  <text x="375" y="527" text-anchor="middle" font-size="9" fill="#64748B">Student/Staff</text>
+
+  <rect x="455" y="490" width="130" height="50" rx="7" fill="white" stroke="#E2E8F0"/>
+  <text x="520" y="511" text-anchor="middle" font-size="10" font-weight="700" fill="#1B3A6B">Finance</text>
+  <text x="520" y="527" text-anchor="middle" font-size="9" fill="#64748B">Fees/Payments</text>
+
+  <rect x="600" y="490" width="130" height="50" rx="7" fill="white" stroke="#E2E8F0"/>
+  <text x="665" y="511" text-anchor="middle" font-size="10" font-weight="700" fill="#1B3A6B">HR/Payroll</text>
+  <text x="665" y="527" text-anchor="middle" font-size="9" fill="#64748B">Staff/Salary</text>
+
+  <rect x="745" y="490" width="130" height="50" rx="7" fill="white" stroke="#E2E8F0"/>
+  <text x="810" y="511" text-anchor="middle" font-size="10" font-weight="700" fill="#1B3A6B">Library</text>
+  <text x="810" y="527" text-anchor="middle" font-size="9" fill="#64748B">Books/Lending</text>
+
+  <rect x="890" y="490" width="130" height="50" rx="7" fill="white" stroke="#E2E8F0"/>
+  <text x="955" y="511" text-anchor="middle" font-size="10" font-weight="700" fill="#1B3A6B">Hostel/Transport</text>
+  <text x="955" y="527" text-anchor="middle" font-size="9" fill="#64748B">Boarding/Fleet</text>
+
+  <!-- Notification Engine -->
+  <rect x="20" y="560" width="1065" height="40" rx="6" fill="#FFF7ED" stroke="#F97316" stroke-width="1.5"/>
+  <text x="250" y="582" text-anchor="middle" font-size="11" font-weight="700" fill="#F97316">NOTIFICATION ENGINE</text>
+  <text x="553" y="582" text-anchor="middle" font-size="10" fill="#92400E">SMS (Termii) | WhatsApp (Meta API) | Email (Mailgun) | In-App (Pusher/Soketi WebSockets)</text>
+
+  <!-- DB Layer -->
+  <rect x="20" y="620" width="510" height="50" rx="7" fill="#1E293B"/>
+  <text x="275" y="642" text-anchor="middle" font-size="11" font-weight="700" fill="white">PER-TENANT DATABASES (MySQL per School)</text>
+  <text x="275" y="660" text-anchor="middle" font-size="9" fill="#94A3B8">students | staff | fees | grades | library | hostel | transport | clinic</text>
+
+  <rect x="545" y="620" width="540" height="50" rx="7" fill="#374151"/>
+  <text x="815" y="642" text-anchor="middle" font-size="11" font-weight="700" fill="white">CENTRAL / LANDLORD DATABASE</text>
+  <text x="815" y="660" text-anchor="middle" font-size="9" fill="#94A3B8">tenants | global_parents | subscription_plans | audit_logs_global</text>
+
+  <!-- Storage -->
+  <rect x="20" y="690" width="330" height="40" rx="6" fill="#0F4C75" opacity="0.9"/>
+  <text x="185" y="715" text-anchor="middle" font-size="11" font-weight="700" fill="white">File Storage — AWS S3 (Passports, PDFs, Docs)</text>
+
+  <rect x="365" y="690" width="330" height="40" rx="6" fill="#0F4C75" opacity="0.9"/>
+  <text x="530" y="715" text-anchor="middle" font-size="11" font-weight="700" fill="white">Cache — Redis (Sessions, Queues, Real-time)</text>
+
+  <rect x="710" y="690" width="375" height="40" rx="6" fill="#0F4C75" opacity="0.9"/>
+  <text x="898" y="715" text-anchor="middle" font-size="11" font-weight="700" fill="white">Search — Meilisearch (Full-text student/staff)</text>
+
+  <!-- Security badge -->
+  <rect x="20" y="750" width="1065" height="30" rx="6" fill="#DC2626" opacity="0.9"/>
+  <text x="553" y="770" text-anchor="middle" font-size="11" font-weight="700" fill="white">SECURITY: TLS 1.2+ | AES-256 | RBAC | Maker-Checker | Audit Trail | NDPR/NDPA Compliant</text>
+</svg>
+</div>
+</div>
+
+<!-- ADMIN DASHBOARD WIREFRAME -->
+<div class="content" id="admin">
+<div class="wireframe-grid">
+  <div class="wireframe-card">
+    <div class="wf-header">Admin Dashboard — Main View <span>School Admin</span></div>
+    <div class="wf-body">
+      <div class="wf-topbar">
+        <div class="wf-avatar"></div>
+        <div><div class="wf-username">Mr. Adeyemi Okafor</div><div class="wf-role">School Administrator — Victoria Heights School</div></div>
+      </div>
+      <div class="wf-nav">
+        <div class="wf-nav-item active">Dashboard</div>
+        <div class="wf-nav-item">Students</div>
+        <div class="wf-nav-item">Staff</div>
+        <div class="wf-nav-item">Finance</div>
+        <div class="wf-nav-item">Academics</div>
+        <div class="wf-nav-item">Reports</div>
+      </div>
+      <div class="wf-stats">
+        <div class="wf-stat"><div class="v">1,240</div><div class="l">Total Students</div></div>
+        <div class="wf-stat"><div class="v">87</div><div class="l">Staff</div></div>
+        <div class="wf-stat"><div class="v">1,198</div><div class="l">Present Today</div></div>
+        <div class="wf-stat"><div class="v">42</div><div class="l">Absent Today</div></div>
+      </div>
+      <div class="wf-chart">
+        <div class="bar" style="height:40px;background:#2E86AB"></div>
+        <div class="bar" style="height:60px;background:#2E86AB"></div>
+        <div class="bar" style="height:35px;background:#2E86AB"></div>
+        <div class="bar" style="height:55px;background:#2E86AB"></div>
+        <div class="bar" style="height:50px;background:#2E86AB"></div>
+        <div class="bar" style="height:45px;background:#2E86AB"></div>
+      </div>
+      <div style="font-size:10px;color:#64748B;margin-bottom:6px">📊 Monthly Fee Collections (₦)</div>
+      <div style="display:flex;gap:6px">
+        <div class="wf-btn btn-primary">+ Enrol Student</div>
+        <div class="wf-btn btn-accent">Generate Invoices</div>
+        <div class="wf-btn btn-outline">Run Payroll</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="wireframe-card">
+    <div class="wf-header">Financial Overview Widget <span>Dashboard Panel</span></div>
+    <div class="wf-body">
+      <div style="margin-bottom:8px;font-size:12px;font-weight:700;color:#1B3A6B">💰 Term Finance Summary — 2025/2026 Term 2</div>
+      <table class="wf-table">
+        <tr><th>Category</th><th>Amount (₦)</th><th>Status</th></tr>
+        <tr><td>Total Fees Billed</td><td>12,400,000</td><td><span class="wf-badge badge-blue">Invoiced</span></td></tr>
+        <tr><td>Total Collected</td><td>9,800,000</td><td><span class="wf-badge badge-green">Paid</span></td></tr>
+        <tr><td>Outstanding</td><td>2,600,000</td><td><span class="wf-badge badge-red">Pending</span></td></tr>
+        <tr><td>Staff Payroll</td><td>3,200,000</td><td><span class="wf-badge badge-yellow">Due</span></td></tr>
+      </table>
+      <div style="margin-top:10px;font-size:10px;color:#64748B">3 Pending Approval Items | 12 Unread Messages</div>
+    </div>
+  </div>
+
+  <div class="wireframe-card">
+    <div class="wf-header">Student List View <span>Records Module</span></div>
+    <div class="wf-body">
+      <div class="wf-input" style="margin-bottom:8px">🔍 Search students by name, ID, class...</div>
+      <table class="wf-table">
+        <tr><th>Name</th><th>Class</th><th>Status</th></tr>
+        <tr><td>Ade Balogun</td><td>JSS 2A</td><td><span class="wf-badge badge-green">Active</span></td></tr>
+        <tr><td>Chisom Eze</td><td>SS 1B</td><td><span class="wf-badge badge-green">Active</span></td></tr>
+        <tr><td>David Obi</td><td>JSS 3A</td><td><span class="wf-badge badge-yellow">Pending Fees</span></td></tr>
+        <tr><td>Fatima Sule</td><td>SS 2C</td><td><span class="wf-badge badge-red">Absent</span></td></tr>
+      </table>
+      <div style="margin-top:8px">
+        <div class="wf-btn btn-primary">View Profile</div>
+        <div class="wf-btn btn-outline">Export List</div>
+        <div class="wf-btn btn-accent">+ Add Student</div>
+      </div>
+    </div>
+  </div>
+</div>
+</div>
+
+<!-- TEACHER PORTAL -->
+<div class="content" id="teacher">
+<div class="wireframe-grid">
+  <div class="wireframe-card">
+    <div class="wf-header">Teacher Dashboard <span>Teacher Portal</span></div>
+    <div class="wf-body">
+      <div class="wf-topbar">
+        <div class="wf-avatar" style="background:#16A34A"></div>
+        <div><div class="wf-username">Mrs. Ngozi Adebayo</div><div class="wf-role">Class Teacher — JSS 2A | Subjects: Maths, English</div></div>
+      </div>
+      <div class="wf-nav">
+        <div class="wf-nav-item active">Dashboard</div>
+        <div class="wf-nav-item">Attendance</div>
+        <div class="wf-nav-item">Gradebook</div>
+        <div class="wf-nav-item">Assignments</div>
+        <div class="wf-nav-item">Timetable</div>
+      </div>
+      <div class="wf-stats">
+        <div class="wf-stat"><div class="v">35</div><div class="l">My Students</div></div>
+        <div class="wf-stat"><div class="v">32</div><div class="l">Present Today</div></div>
+        <div class="wf-stat"><div class="v">3</div><div class="l">Absent</div></div>
+        <div class="wf-stat"><div class="v">5</div><div class="l">Pending Tasks</div></div>
+      </div>
+      <div style="font-size:12px;font-weight:700;color:#1B3A6B;margin-bottom:6px">📅 Today's Schedule (Mon)</div>
+      <table class="wf-table">
+        <tr><th>Period</th><th>Subject</th><th>Class</th><th>Room</th></tr>
+        <tr><td>8:00–8:40</td><td>Mathematics</td><td>JSS 2A</td><td>Room 4</td></tr>
+        <tr><td>9:00–9:40</td><td>English</td><td>JSS 2A</td><td>Room 4</td></tr>
+        <tr><td>11:00–11:40</td><td>Mathematics</td><td>JSS 3B</td><td>Room 7</td></tr>
+      </table>
+    </div>
+  </div>
+
+  <div class="wireframe-card">
+    <div class="wf-header">Attendance Marking <span>Teacher → Students</span></div>
+    <div class="wf-body">
+      <div style="font-size:12px;font-weight:700;color:#1B3A6B;margin-bottom:8px">📝 JSS 2A Attendance — Monday 7 April 2026</div>
+      <table class="wf-table">
+        <tr><th>Student</th><th>Status</th><th>Reason</th></tr>
+        <tr><td>Ade Balogun</td><td><span class="wf-badge badge-green">Present</span></td><td>—</td></tr>
+        <tr><td>Chisom Eze</td><td><span class="wf-badge badge-red">Absent</span></td><td>Sick</td></tr>
+        <tr><td>Fatima Sule</td><td><span class="wf-badge badge-green">Present</span></td><td>—</td></tr>
+        <tr><td>Emeka Chukwu</td><td><span class="wf-badge badge-yellow">Late</span></td><td>—</td></tr>
+      </table>
+      <div style="margin-top:6px;font-size:10px;color:#DC2626">⚠ 1 absent student — SMS alert will be sent to parent(s)</div>
+      <div style="margin-top:8px">
+        <div class="wf-btn btn-primary">Submit Attendance</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="wireframe-card">
+    <div class="wf-header">Gradebook — Score Entry <span>Subject Teacher View</span></div>
+    <div class="wf-body">
+      <div style="font-size:11px;font-weight:700;color:#64748B;margin-bottom:8px">Mathematics | JSS 2A | 2025/2026 Term 2</div>
+      <table class="wf-table">
+        <tr><th>Student</th><th>CA (40)</th><th>Exam (60)</th><th>Total</th><th>Grade</th></tr>
+        <tr><td>Ade Balogun</td><td>35</td><td>52</td><td>87</td><td><span class="wf-badge badge-green">A1</span></td></tr>
+        <tr><td>Chisom Eze</td><td>28</td><td>41</td><td>69</td><td><span class="wf-badge badge-blue">B2</span></td></tr>
+        <tr><td>Fatima Sule</td><td>38</td><td>55</td><td>93</td><td><span class="wf-badge badge-green">A1</span></td></tr>
+        <tr><td>Emeka Chukwu</td><td>22</td><td>33</td><td>55</td><td><span class="wf-badge badge-yellow">C4</span></td></tr>
+      </table>
+      <div style="margin-top:8px">
+        <div class="wf-btn btn-primary">Save Scores</div>
+        <div class="wf-btn btn-accent">Submit Broadsheet</div>
+      </div>
+    </div>
+  </div>
+</div>
+</div>
+
+<!-- PARENT PORTAL -->
+<div class="content" id="parent">
+<div class="wireframe-grid">
+  <div class="wireframe-card">
+    <div class="wf-header">Parent Dashboard — myschooltrack.com <span>Parent Portal</span></div>
+    <div class="wf-body">
+      <div class="wf-topbar">
+        <div class="wf-avatar" style="background:#D97706"></div>
+        <div><div class="wf-username">Mr. Taiwo Adeyemi</div><div class="wf-role">Parent | 2 Children on Schooltrack</div></div>
+      </div>
+      <div style="font-size:12px;font-weight:700;color:#1B3A6B;margin-bottom:10px">👶 My Children</div>
+      <div style="display:flex;gap:10px;margin-bottom:12px">
+        <div style="flex:1;background:#EEF4FB;border-radius:10px;padding:10px;border:2px solid #2E86AB;text-align:center;cursor:pointer">
+          <div class="wf-avatar" style="width:40px;height:40px;margin:0 auto 6px;background:#1B3A6B"></div>
+          <div style="font-size:12px;font-weight:700">Ade Adeyemi</div>
+          <div style="font-size:10px;color:#64748B">Victoria Heights • JSS 2A</div>
+          <span class="wf-badge badge-green">Active</span>
+        </div>
+        <div style="flex:1;background:#F1F5F9;border-radius:10px;padding:10px;text-align:center;cursor:pointer">
+          <div class="wf-avatar" style="width:40px;height:40px;margin:0 auto 6px;background:#16A34A"></div>
+          <div style="font-size:12px;font-weight:700">Kemi Adeyemi</div>
+          <div style="font-size:10px;color:#64748B">Victoria Heights • Primary 4</div>
+          <span class="wf-badge badge-yellow">Fees Due</span>
+        </div>
+      </div>
+      <div style="font-size:11px;font-weight:700;color:#64748B;margin-bottom:6px">Selected Child: Ade Adeyemi</div>
+      <div class="wf-stats">
+        <div class="wf-stat"><div class="v">48/52</div><div class="l">Days Present</div></div>
+        <div class="wf-stat"><div class="v">8/10</div><div class="l">Assignments Done</div></div>
+      </div>
+    </div>
+  </div>
+
+  <div class="wireframe-card">
+    <div class="wf-header">Invoice & Payment View <span>Parent → Finance</span></div>
+    <div class="wf-body">
+      <table class="wf-table">
+        <tr><th>Invoice</th><th>Total (₦)</th><th>Paid</th><th>Outstanding</th></tr>
+        <tr><td>INV-0234</td><td>150,000</td><td>150,000</td><td><span class="wf-badge badge-green">₦0</span></td></tr>
+        <tr><td>INV-0285</td><td>155,000</td><td>0</td><td><span class="wf-badge badge-red">₦155,000</span></td></tr>
+      </table>
+      <div style="margin-top:10px;background:#FFF7ED;border-radius:8px;padding:8px;font-size:11px;color:#92400E;border-left:3px solid #F97316">
+        ⚠ Outstanding balance of ₦155,000 for Term 2. Due date: 15 Apr 2026.
+      </div>
+      <div style="margin-top:8px">
+        <div class="wf-btn btn-accent">Pay Now via Paystack</div>
+        <div class="wf-btn btn-outline">View Receipt</div>
+      </div>
+      <div style="margin-top:6px;font-size:10px;color:#16A34A">✅ Gate pass will be generated on payment completion</div>
+    </div>
+  </div>
+
+  <div class="wireframe-card">
+    <div class="wf-header">Report Card View <span>Parent → Academics</span></div>
+    <div class="wf-body">
+      <div style="font-size:11px;font-weight:700;color:#64748B;margin-bottom:8px">Ade Adeyemi | JSS 2A | 2025/2026 Term 2</div>
+      <table class="wf-table">
+        <tr><th>Subject</th><th>CA</th><th>Exam</th><th>Total</th><th>Grade</th><th>Position</th></tr>
+        <tr><td>Mathematics</td><td>35</td><td>52</td><td>87</td><td><span class="wf-badge badge-green">A1</span></td><td>3rd</td></tr>
+        <tr><td>English</td><td>30</td><td>48</td><td>78</td><td><span class="wf-badge badge-blue">B2</span></td><td>7th</td></tr>
+        <tr><td>Science</td><td>38</td><td>55</td><td>93</td><td><span class="wf-badge badge-green">A1</span></td><td>1st</td></tr>
+      </table>
+      <div style="margin-top:8px;font-size:11px;color:#1B3A6B"><strong>Overall Position: 4th / 35 | Average: 79.3%</strong></div>
+      <div style="margin-top:6px;font-size:10px;color:#64748B;font-style:italic">"Ade is a bright student. Keep up the excellent work!" — Mrs. Adebayo</div>
+      <div style="margin-top:8px"><div class="wf-btn btn-primary">Download PDF</div></div>
+    </div>
+  </div>
+</div>
+</div>
+
+<!-- STUDENT PORTAL -->
+<div class="content" id="student">
+<div class="wireframe-grid">
+  <div class="wireframe-card">
+    <div class="wf-header">Student Dashboard <span>Student Portal</span></div>
+    <div class="wf-body">
+      <div class="wf-topbar">
+        <div class="wf-avatar" style="background:#7C3AED"></div>
+        <div><div class="wf-username">Ade Adeyemi (VHIS/ST/2023/0089)</div><div class="wf-role">JSS 2A | 2025/2026 Term 2</div></div>
+      </div>
+      <div class="wf-nav">
+        <div class="wf-nav-item active">Dashboard</div>
+        <div class="wf-nav-item">Timetable</div>
+        <div class="wf-nav-item">Assignments</div>
+        <div class="wf-nav-item">Scores</div>
+        <div class="wf-nav-item">Library</div>
+      </div>
+      <div class="wf-stats">
+        <div class="wf-stat"><div class="v">48</div><div class="l">Days Present</div></div>
+        <div class="wf-stat"><div class="v">8/10</div><div class="l">Assignments</div></div>
+        <div class="wf-stat"><div class="v">79%</div><div class="l">Avg Score</div></div>
+        <div class="wf-stat"><div class="v">4th</div><div class="l">Position</div></div>
+      </div>
+      <div style="font-size:11px;font-weight:700;color:#1B3A6B;margin-bottom:6px">📌 Due Soon</div>
+      <div style="background:#FEF3C7;border-radius:8px;padding:8px;font-size:11px;border-left:3px solid #D97706">
+        📚 Library book "Biology for JSS" due in 3 days!
+      </div>
+    </div>
+  </div>
+
+  <div class="wireframe-card">
+    <div class="wf-header">Assignments View <span>Student Module</span></div>
+    <div class="wf-body">
+      <table class="wf-table">
+        <tr><th>Subject</th><th>Title</th><th>Due</th><th>Status</th></tr>
+        <tr><td>Maths</td><td>Algebra Set 3</td><td>08 Apr</td><td><span class="wf-badge badge-yellow">Pending</span></td></tr>
+        <tr><td>English</td><td>Essay Writing</td><td>05 Apr</td><td><span class="wf-badge badge-green">Submitted</span></td></tr>
+        <tr><td>Science</td><td>Lab Report</td><td>10 Apr</td><td><span class="wf-badge badge-blue">Accepted</span></td></tr>
+        <tr><td>Maths</td><td>Geometry Quiz</td><td>03 Apr</td><td><span class="wf-badge badge-red">Not Submitted</span></td></tr>
+      </table>
+      <div style="margin-top:8px">
+        <div class="wf-btn btn-accent">Upload Assignment</div>
+      </div>
+    </div>
+  </div>
+</div>
+</div>
+
+<!-- ENROLMENT FLOW -->
+<div class="content" id="enrolment">
+<div class="diagram">
+<svg width="900" height="560" viewBox="0 0 900 560">
+  <defs>
+    <marker id="ae" markerWidth="8" markerHeight="8" refX="6" refY="3" orient="auto"><path d="M0,0 L0,6 L8,3 z" fill="#64748B"/></marker>
+  </defs>
+  <text x="450" y="28" text-anchor="middle" font-size="15" font-weight="700" fill="#1B3A6B">ENROLMENT & ADMISSION FLOW</text>
+
+  <!-- Steps -->
+  <rect x="340" y="50" width="220" height="45" rx="8" fill="#2E86AB"/>
+  <text x="450" y="68" text-anchor="middle" font-size="12" font-weight="700" fill="white">1. Parent visits enrolment page</text>
+  <text x="450" y="84" text-anchor="middle" font-size="10" fill="#CBD5E1">school.schooltrack.ng/apply</text>
+
+  <line x1="450" y1="95" x2="450" y2="120" stroke="#64748B" stroke-width="2" marker-end="url(#ae)"/>
+  <rect x="320" y="120" width="260" height="45" rx="8" fill="#2E86AB"/>
+  <text x="450" y="138" text-anchor="middle" font-size="12" font-weight="700" fill="white">2. Complete Application Form</text>
+  <text x="450" y="154" text-anchor="middle" font-size="10" fill="#CBD5E1">Bio-data, Parents info, Class of interest</text>
+
+  <line x1="450" y1="165" x2="450" y2="190" stroke="#64748B" stroke-width="2" marker-end="url(#ae)"/>
+  <rect x="320" y="190" width="260" height="45" rx="8" fill="#F97316"/>
+  <text x="450" y="208" text-anchor="middle" font-size="12" font-weight="700" fill="white">3. Pay Application Fee Online</text>
+  <text x="450" y="224" text-anchor="middle" font-size="10" fill="#FEF3C7">Paystack / Flutterwave Gateway</text>
+
+  <line x1="450" y1="235" x2="450" y2="260" stroke="#64748B" stroke-width="2" marker-end="url(#ae)"/>
+  <rect x="320" y="260" width="260" height="45" rx="8" fill="#16A34A"/>
+  <text x="450" y="278" text-anchor="middle" font-size="12" font-weight="700" fill="white">4. Auto-generated Application No.</text>
+  <text x="450" y="294" text-anchor="middle" font-size="10" fill="#D1FAE5">SMS + Email sent to parent</text>
+
+  <line x1="450" y1="305" x2="450" y2="330" stroke="#64748B" stroke-width="2" marker-end="url(#ae)"/>
+  <rect x="300" y="330" width="300" height="45" rx="8" fill="#1B3A6B"/>
+  <text x="450" y="348" text-anchor="middle" font-size="12" font-weight="700" fill="white">5. School Admin Reviews Application</text>
+  <text x="450" y="364" text-anchor="middle" font-size="10" fill="#CBD5E1">Pending Applications List in Admin Panel</text>
+
+  <!-- Decision diamond -->
+  <line x1="450" y1="375" x2="450" y2="400" stroke="#64748B" stroke-width="2" marker-end="url(#ae)"/>
+  <polygon points="450,400 530,430 450,460 370,430" fill="#D97706"/>
+  <text x="450" y="428" text-anchor="middle" font-size="11" font-weight="700" fill="white">APPROVE?</text>
+
+  <!-- Yes branch -->
+  <line x1="530" y1="430" x2="680" y2="430" stroke="#16A34A" stroke-width="2" marker-end="url(#ae)"/>
+  <rect x="680" y="405" width="200" height="50" rx="8" fill="#16A34A"/>
+  <text x="780" y="425" text-anchor="middle" font-size="11" font-weight="700" fill="white">✓ APPROVED</text>
+  <text x="780" y="441" text-anchor="middle" font-size="9" fill="#D1FAE5">Student + Parent records auto-created</text>
+  <line x1="780" y1="455" x2="780" y2="485" stroke="#64748B" stroke-width="1.5" marker-end="url(#ae)"/>
+  <rect x="680" y="485" width="200" height="45" rx="8" fill="#1B3A6B"/>
+  <text x="780" y="503" text-anchor="middle" font-size="10" font-weight="700" fill="white">IDs sent via SMS + Email</text>
+  <text x="780" y="519" text-anchor="middle" font-size="9" fill="#CBD5E1">Student No. + Parent No. generated</text>
+  <text x="600" y="422" font-size="11" font-weight="700" fill="#16A34A">YES</text>
+
+  <!-- No branch -->
+  <line x1="370" y1="430" x2="220" y2="430" stroke="#DC2626" stroke-width="2" marker-end="url(#ae)"/>
+  <rect x="20" y="405" width="200" height="50" rx="8" fill="#DC2626"/>
+  <text x="120" y="425" text-anchor="middle" font-size="11" font-weight="700" fill="white">✗ DECLINED</text>
+  <text x="120" y="441" text-anchor="middle" font-size="9" fill="#FEE2E2">Standard letter sent to parent</text>
+  <text x="240" y="422" font-size="11" font-weight="700" fill="#DC2626">NO</text>
+</svg>
+</div>
+</div>
+
+<!-- ACADEMICS FLOW -->
+<div class="content" id="academics">
+<div class="diagram">
+<svg width="900" height="540" viewBox="0 0 900 540">
+  <defs>
+    <marker id="aa" markerWidth="8" markerHeight="8" refX="6" refY="3" orient="auto"><path d="M0,0 L0,6 L8,3 z" fill="#64748B"/></marker>
+  </defs>
+  <text x="450" y="28" text-anchor="middle" font-size="15" font-weight="700" fill="#1B3A6B">ACADEMIC RESULT & APPROVAL FLOW (MAKER-CHECKER)</text>
+
+  <rect x="50" y="50" width="180" height="45" rx="8" fill="#2E86AB"/>
+  <text x="140" y="72" text-anchor="middle" font-size="11" font-weight="700" fill="white">Subject Teacher</text>
+  <text x="140" y="87" text-anchor="middle" font-size="9" fill="#CBD5E1">Enters CA + Exam Scores</text>
+
+  <line x1="230" y1="72" x2="310" y2="72" stroke="#64748B" stroke-width="2" marker-end="url(#aa)"/>
+
+  <rect x="310" y="50" width="200" height="45" rx="8" fill="#2E86AB"/>
+  <text x="410" y="72" text-anchor="middle" font-size="11" font-weight="700" fill="white">System Auto-Calculates</text>
+  <text x="410" y="87" text-anchor="middle" font-size="9" fill="#CBD5E1">Total Score + Grade (Parameter-Based)</text>
+
+  <line x1="510" y1="72" x2="590" y2="72" stroke="#64748B" stroke-width="2" marker-end="url(#aa)"/>
+
+  <rect x="590" y="50" width="180" height="45" rx="8" fill="#1B3A6B"/>
+  <text x="680" y="72" text-anchor="middle" font-size="11" font-weight="700" fill="white">Class Broadsheet</text>
+  <text x="680" y="87" text-anchor="middle" font-size="9" fill="#CBD5E1">All subjects compiled per class</text>
+
+  <line x1="680" y1="95" x2="680" y2="140" stroke="#64748B" stroke-width="2" marker-end="url(#aa)"/>
+
+  <rect x="590" y="140" width="180" height="45" rx="8" fill="#16A34A"/>
+  <text x="680" y="162" text-anchor="middle" font-size="11" font-weight="700" fill="white">Class Teacher Reviews</text>
+  <text x="680" y="177" text-anchor="middle" font-size="9" fill="#D1FAE5">Adds student comments, submits</text>
+
+  <line x1="590" y1="162" x2="510" y2="162" stroke="#64748B" stroke-width="2" marker-end="url(#aa)"/>
+
+  <rect x="310" y="140" width="200" height="45" rx="8" fill="#F97316"/>
+  <text x="410" y="162" text-anchor="middle" font-size="11" font-weight="700" fill="white">VP Academics / Registrar</text>
+  <text x="410" y="177" text-anchor="middle" font-size="9" fill="#FEF3C7">Reviews broadsheet submission</text>
+
+  <!-- Decision -->
+  <line x1="410" y1="185" x2="410" y2="220" stroke="#64748B" stroke-width="2" marker-end="url(#aa)"/>
+  <polygon points="410,220 480,255 410,290 340,255" fill="#D97706"/>
+  <text x="410" y="253" text-anchor="middle" font-size="10" font-weight="700" fill="white">APPROVE?</text>
+
+  <!-- Approve -->
+  <line x1="480" y1="255" x2="600" y2="255" stroke="#16A34A" stroke-width="2" marker-end="url(#aa)"/>
+  <rect x="600" y="230" width="190" height="50" rx="8" fill="#16A34A"/>
+  <text x="695" y="250" text-anchor="middle" font-size="11" font-weight="700" fill="white">✓ Approved</text>
+  <text x="695" y="266" text-anchor="middle" font-size="9" fill="#D1FAE5">Report cards generated (auto/manual)</text>
+  <text x="543" y="247" font-size="11" font-weight="700" fill="#16A34A">YES</text>
+  <line x1="695" y1="280" x2="695" y2="310" stroke="#64748B" stroke-width="1.5" marker-end="url(#aa)"/>
+  <rect x="600" y="310" width="190" height="45" rx="8" fill="#2563EB"/>
+  <text x="695" y="330" text-anchor="middle" font-size="11" font-weight="700" fill="white">📤 Published to Parents</text>
+  <text x="695" y="346" text-anchor="middle" font-size="9" fill="#DBEAFE">SMS + Email notification sent</text>
+
+  <!-- Return -->
+  <line x1="340" y1="255" x2="220" y2="255" stroke="#DC2626" stroke-width="2" marker-end="url(#aa)"/>
+  <rect x="20" y="230" width="200" height="50" rx="8" fill="#DC2626"/>
+  <text x="120" y="250" text-anchor="middle" font-size="11" font-weight="700" fill="white">↩ Returned</text>
+  <text x="120" y="266" text-anchor="middle" font-size="9" fill="#FEE2E2">Comments sent to class teacher</text>
+  <text x="245" y="247" font-size="11" font-weight="700" fill="#DC2626">NO</text>
+
+  <!-- Corrections loop -->
+  <line x1="120" y1="280" x2="120" y2="370" stroke="#DC2626" stroke-width="1.5" stroke-dasharray="4"/>
+  <line x1="120" y1="370" x2="640" y2="370" stroke="#DC2626" stroke-width="1.5" stroke-dasharray="4"/>
+  <line x1="640" y1="370" x2="640" y2="185" stroke="#DC2626" stroke-width="1.5" stroke-dasharray="4" marker-end="url(#aa)"/>
+  <text x="380" y="390" text-anchor="middle" font-size="10" fill="#DC2626" font-style="italic">Correction loop — class teacher updates and resubmits</text>
+
+  <!-- Audit trail note -->
+  <rect x="20" y="430" width="860" height="40" rx="8" fill="#1E293B"/>
+  <text x="450" y="452" text-anchor="middle" font-size="10" font-weight="700" fill="white">🔒 AUDIT TRAIL: All approvals, returns, and edits are logged with user ID, timestamp, and action — IMMUTABLE</text>
+  <text x="450" y="464" text-anchor="middle" font-size="9" fill="#94A3B8">Changes to approved results require maker-checker re-approval before taking effect</text>
+</svg>
+</div>
+</div>
+
+<!-- FINANCE FLOW -->
+<div class="content" id="finance">
+<div class="diagram">
+<svg width="900" height="480" viewBox="0 0 900 480">
+  <defs>
+    <marker id="af" markerWidth="8" markerHeight="8" refX="6" refY="3" orient="auto"><path d="M0,0 L0,6 L8,3 z" fill="#64748B"/></marker>
+  </defs>
+  <text x="450" y="28" text-anchor="middle" font-size="15" font-weight="700" fill="#1B3A6B">FEE BILLING & PAYMENT FLOW</text>
+
+  <rect x="50" y="50" width="200" height="50" rx="8" fill="#1B3A6B"/>
+  <text x="150" y="72" text-anchor="middle" font-size="11" font-weight="700" fill="white">1. Bursar Configures</text>
+  <text x="150" y="87" text-anchor="middle" font-size="9" fill="#CBD5E1">Fee types, amounts, due dates per class/term</text>
+
+  <line x1="250" y1="75" x2="310" y2="75" stroke="#64748B" stroke-width="2" marker-end="url(#af)"/>
+
+  <rect x="310" y="50" width="200" height="50" rx="8" fill="#2E86AB"/>
+  <text x="410" y="72" text-anchor="middle" font-size="11" font-weight="700" fill="white">2. Bursar Generates Invoices</text>
+  <text x="410" y="87" text-anchor="middle" font-size="9" fill="#CBD5E1">Bulk or per student | Unique invoice numbers</text>
+
+  <line x1="510" y1="75" x2="570" y2="75" stroke="#64748B" stroke-width="2" marker-end="url(#af)"/>
+
+  <rect x="570" y="50" width="200" height="50" rx="8" fill="#F97316"/>
+  <text x="670" y="72" text-anchor="middle" font-size="11" font-weight="700" fill="white">3. Senior Approves Invoices</text>
+  <text x="670" y="87" text-anchor="middle" font-size="9" fill="#FEF3C7">Maker-checker before sending to parents</text>
+
+  <line x1="670" y1="100" x2="670" y2="140" stroke="#64748B" stroke-width="2" marker-end="url(#af)"/>
+
+  <rect x="570" y="140" width="200" height="50" rx="8" fill="#16A34A"/>
+  <text x="670" y="162" text-anchor="middle" font-size="11" font-weight="700" fill="white">4. Invoices Sent to Parents</text>
+  <text x="670" y="177" text-anchor="middle" font-size="9" fill="#D1FAE5">Email + WhatsApp with payment link</text>
+
+  <line x1="570" y1="165" x2="510" y2="165" stroke="#64748B" stroke-width="2" marker-end="url(#af)"/>
+
+  <rect x="310" y="140" width="200" height="50" rx="8" fill="#7C3AED"/>
+  <text x="410" y="162" text-anchor="middle" font-size="11" font-weight="700" fill="white">5. Parent Receives Invoice</text>
+  <text x="410" y="177" text-anchor="middle" font-size="9" fill="#EDE9FE">Parent Portal shows balance + Pay Now</text>
+
+  <line x1="410" y1="190" x2="410" y2="230" stroke="#64748B" stroke-width="2" marker-end="url(#af)"/>
+
+  <rect x="300" y="230" width="220" height="50" rx="8" fill="#F97316"/>
+  <text x="410" y="252" text-anchor="middle" font-size="11" font-weight="700" fill="white">6. Parent Pays Online</text>
+  <text x="410" y="267" text-anchor="middle" font-size="9" fill="#FEF3C7">Paystack / Flutterwave Gateway</text>
+
+  <line x1="410" y1="280" x2="410" y2="320" stroke="#64748B" stroke-width="2" marker-end="url(#af)"/>
+
+  <rect x="300" y="320" width="220" height="50" rx="8" fill="#16A34A"/>
+  <text x="410" y="342" text-anchor="middle" font-size="11" font-weight="700" fill="white">7. Payment Webhook Received</text>
+  <text x="410" y="357" text-anchor="middle" font-size="9" fill="#D1FAE5">System verifies signature & updates invoice</text>
+
+  <line x1="520" y1="345" x2="600" y2="345" stroke="#64748B" stroke-width="2" marker-end="url(#af)"/>
+  <rect x="600" y="320" width="185" height="50" rx="8" fill="#1B3A6B"/>
+  <text x="693" y="342" text-anchor="middle" font-size="11" font-weight="700" fill="white">📄 Receipt Generated</text>
+  <text x="693" y="357" text-anchor="middle" font-size="9" fill="#CBD5E1">Gate Pass PDF via WhatsApp/Email</text>
+
+  <line x1="300" y1="345" x2="220" y2="345" stroke="#64748B" stroke-width="2" marker-end="url(#af)"/>
+  <rect x="20" y="320" width="200" height="50" rx="8" fill="#2563EB"/>
+  <text x="120" y="342" text-anchor="middle" font-size="11" font-weight="700" fill="white">📊 Dashboard Updated</text>
+  <text x="120" y="357" text-anchor="middle" font-size="9" fill="#DBEAFE">Bursar sees real-time collection stats</text>
+
+  <rect x="20" y="420" width="860" height="35" rx="6" fill="#1E293B"/>
+  <text x="450" y="442" text-anchor="middle" font-size="10" font-weight="700" fill="white">💳 Payment Gateway: Paystack (Primary) | Flutterwave (Secondary) | Automated reconciliation with General Ledger</text>
+</svg>
+</div>
+</div>
+
+<script>
+function showTab(id) {
+  document.querySelectorAll('.content').forEach(c => c.classList.remove('active'));
+  document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+  document.getElementById(id).classList.add('active');
+  event.target.classList.add('active');
+}
+</script>
+</body>
+</html>
