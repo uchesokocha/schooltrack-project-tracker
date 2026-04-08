@@ -7,8 +7,8 @@
 <style>
 :root{--primary:#1B3A6B;--secondary:#2E86AB;--accent:#F97316;--green:#16A34A;--light:#EEF4FB;--dark:#1E293B;--gray:#64748B;--white:#fff}
 *{margin:0;padding:0;box-sizing:border-box;font-family:'Inter',sans-serif}
-body{background:#F0F4F8;color:var(--dark)}
-.header{background:linear-gradient(135deg,var(--primary),#2563EB);color:white;padding:22px 36px;display:flex;justify-content:space-between;align-items:center;box-shadow:0 4px 20px rgba(0,0,0,.2)}
+body{background:#F8FAFC;background-image:radial-gradient(at 0% 0%, hsla(210,100%,97%,1) 0, transparent 50%), radial-gradient(at 100% 100%, hsla(210,100%,96%,1) 0, transparent 50%);color:var(--dark);min-height:100vh}
+.header{background:linear-gradient(135deg,rgba(27,58,107,0.85),rgba(37,99,235,0.85));backdrop-filter:blur(16px);-webkit-backdrop-filter:blur(16px);border-bottom:1px solid rgba(255,255,255,0.1);color:white;padding:22px 36px;display:flex;justify-content:space-between;align-items:center;box-shadow:0 4px 30px rgba(0,0,0,.1)}
 .header h1{font-size:22px;font-weight:700}
 .header p{font-size:12px;opacity:.8;margin-top:4px}
 .tabs{display:flex;gap:0;background:white;border-bottom:2px solid #E2E8F0;padding:0 36px;overflow-x:auto}
@@ -24,8 +24,8 @@ svg text{font-family:'Inter',sans-serif}
 
 /* Card grid for wireframes */
 .wireframe-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(300px,1fr));gap:20px}
-.wireframe-card{background:white;border-radius:14px;overflow:hidden;box-shadow:0 4px 14px rgba(0,0,0,0.05);border:1px solid rgba(226, 232, 240, 0.8);transition:transform 0.3s ease, box-shadow 0.3s ease;}
-.wireframe-card:hover { transform: translateY(-4px); box-shadow: 0 12px 28px rgba(0,0,0,0.12); }
+.wireframe-card{background:white;border-radius:20px;overflow:hidden;box-shadow:0 4px 20px rgba(0,0,0,0.04);border:1px solid rgba(226, 232, 240, 0.7);transition:transform 0.3s cubic-bezier(0.4, 0, 0.2, 1), box-shadow 0.3s cubic-bezier(0.4, 0, 0.2, 1);}
+.wireframe-card:hover { transform: translateY(-6px); box-shadow: 0 16px 32px rgba(0,0,0,0.08); }
 .wf-header{background:var(--primary);color:white;padding:12px 18px;font-size:14px;font-weight:700;display:flex;justify-content:space-between;align-items:center}
 .wf-header span{font-size:11px;opacity:.8}
 .wf-body{padding:16px}
@@ -65,13 +65,16 @@ svg text{font-family:'Inter',sans-serif}
 
   /* Top Nav */
   .top-nav {
-    background: #0F172A;
+    background: rgba(15, 23, 42, 0.8);
+    backdrop-filter: blur(16px);
+    -webkit-backdrop-filter: blur(16px);
+    border-bottom: 1px solid rgba(255, 255, 255, 0.05);
     color: white;
     padding: 12px 40px;
     position: sticky;
     top: 0;
     z-index: 1000;
-    box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+    box-shadow: 0 4px 30px rgba(0,0,0,0.1);
   }
   .nav-container {
     display: flex;
@@ -148,7 +151,6 @@ svg text{font-family:'Inter',sans-serif}
       <a href="index.html" class="nav-link">Project Tracker</a>
       <a href="flow.html" class="nav-link active">UI Flow Diagram</a>
     </div>
-    <div class="deploy-badge">GitHub Pages Ready</div>
   </div>
 </nav>
 <div class="header">
