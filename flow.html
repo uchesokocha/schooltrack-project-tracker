@@ -138,6 +138,18 @@ svg text{font-family:'Inter',sans-serif}
     70% { transform: scale(1); box-shadow: 0 0 0 6px rgba(255, 255, 255, 0); }
     100% { transform: scale(0.95); box-shadow: 0 0 0 0 rgba(255, 255, 255, 0); }
   }
+
+  /* Mobile Responsiveness */
+  @media (max-width: 768px) {
+    .top-nav { padding: 16px 20px; }
+    .nav-container { flex-direction: column; align-items: flex-start; gap: 12px; }
+    .nav-links { gap: 16px; flex-wrap: wrap; }
+    .header { flex-direction: column; align-items: flex-start; padding: 20px; gap: 16px; }
+    .content { padding: 16px 20px; }
+    .tabs { padding: 0 16px; }
+    .wireframe-grid { grid-template-columns: 1fr; }
+    .dev-status-banner { font-size: 11px; padding: 10px; line-height: 1.4; }
+  }
 </style>
 </head>
 <body>
